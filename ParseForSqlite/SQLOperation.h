@@ -113,5 +113,6 @@
 -(void)insertPuzzleTabel:(NSString*)strQuestion Answer:(NSString*)strAnswer mainType:(int)mainType subType:(int)subType
                 TextType:(NSString*)strTextType puzzleIndex:(int)index levelType:(int)leveltype isAnswer:(int)isAnswer;
 -(int)getMaxIndexINTablePUZZLEINFO;
+-(BOOL)getIsHasSameQuestion:(NSString*)strQuestion;
 
 @end

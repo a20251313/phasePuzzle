@@ -32,35 +32,72 @@
  [self child];
  [self miyuDB];
  
-  [self miyuplistFromriddlelist];
-  [self miyuplistFromQuestion2list];
-  [self getMiyUFromTxt];
+ [self miyuplistFromriddlelist];
+ [self miyuplistFromQuestion2list];
+ [self miyuplistFromQuestion3list];
+ [self miyuDaquanDB];
+ [self getMiyUFromTxt];
 */
 //suntype 1 日常用品  2 爱情  3 字谜 4 动物  5有趣的事    6 人名  7 孩童谜语  8植物 9影视谜语 10 地名
+
+
+
+
 -(IBAction)clickStart:(id)sender
 {
    
-    [self tiku3Function];
-    [self plant];
-    [self animal];
-    [self name];
-    [self fun];
-    [self dailyneces];
-    [self love];
-    [self idiom];
-    [self word];
-    [self child];
-    [self miyuDB];
-    
-    [self miyuplistFromriddlelist];
-    [self miyuplistFromQuestion2list];
-    [self miyuplistFromQuestion3list];
-    [self miyuDaquanDB];
-    [self getMiyUFromTxt];
-    
+    [NSThread detachNewThreadSelector:@selector(wholeMiYuFromTxt) toTarget:self withObject:nil];
+    [JFSQLManger closeDB];
 }
 
 
+
+
+-(void)wholeMiYuFromTxt
+{
+    
+    NSMutableArray  *array = [JFPhaseData GetDataFromMiyudaquanTxt:@"/Users/popo/Desktop/Documents/puzzleinfo.txt"];
+    
+    if ([array count] < 5)
+    {
+        DLOG(@"array is not enouch");
+        return;
+    }
+    
+    int levelIndex = 0;//[JFSQLManger getMaxIndexFromTablePuzzleTable];
+    levelIndex++;
+    for (NSString  *strInfo in array)
+    {
+        strInfo = [strInfo stringByReplacingOccurrencesOfString:@"||" withString:@"|没有类型|"];
+        NSArray  *arrayObjects = [strInfo componentsSeparatedByString:@"|"];
+    
+        if ([arrayObjects count] >= 6)
+        {
+       
+            NSString  *strQ = [arrayObjects objectAtIndex:1];
+            BOOL  bhasQ = [JFSQLManger isHasSameQuestion:strQ];
+            if (bhasQ)
+            {
+                continue;
+            }
+            int  mainType = 1;
+            int  subType = 0;
+            NSString  *strA = [arrayObjects objectAtIndex:2];
+            mainType = [[arrayObjects objectAtIndex:3] intValue];
+            subType = [[arrayObjects objectAtIndex:4] intValue];
+            NSString  *textType = [arrayObjects objectAtIndex:5];
+            strQ = [strQ stringByReplacingOccurrencesOfString:@"'" withString:@"‘"];
+            [JFSQLManger insertToSql:strQ answer:strA maintype:mainType subType:subType levelType:1 index:levelIndex typeString:textType isAnswer:0];
+            levelIndex++;
+        }else
+        {
+            DLOG(@"strInfo:%@ levelIndex:%d",strInfo,levelIndex);
+        }
+    }
+    
+    
+    DLOG(@"wholeMiYuFromTxt finish");
+}
 
 
 -(void)getMiyUFromTxt
@@ -94,6 +131,7 @@
             }
             
             [JFSQLManger insertToSql:strQ answer:strA maintype:2 subType:0 levelType:1 index:levelIndex typeString:@"脑筋急转弯" isAnswer:0];
+            levelIndex++;
             
         }
     }

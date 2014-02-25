@@ -13,4 +13,6 @@
 
 +(void)insertToSql:(NSString*)strQuestion answer:(NSString*)strAnswer maintype:(int)mainType subType:(int)subType levelType:(int)leveltype  index:(int)index  typeString:(NSString*)typeString isAnswer:(int)isAnswer;
 +(int)getMaxIndexFromTablePuzzleTable;
++(BOOL)isHasSameQuestion:(NSString*)strQuestion;
++(void)closeDB;
 @end

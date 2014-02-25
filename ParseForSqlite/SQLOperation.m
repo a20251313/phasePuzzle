@@ -188,6 +188,45 @@ static SQLOperation *operation = nil;
 }
 
 
+-(BOOL)getIsHasSameQuestion:(NSString*)strQuestion
+{
+    
+    
+    __block int maxIndex = 0;
+    [self.dbQueue inDatabase:^(FMDatabase *db) {
+        
+        [db open];
+        
+        NSString *query = [[NSString alloc] initWithFormat: @"select count from PUZZLEINFO where QUESTION='%@'",strQuestion];
+        
+        FMResultSet *rs = [db executeQuery:query];
+        
+        [query release];
+        
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        
+        while (rs.next)
+        {
+            
+            maxIndex = [rs intForColumnIndex:0];
+            
+            
+            //DLOG(@"infoDic:%@",infoDic);
+        }
+        
+        [rs close];
+        
+        [db close];
+        
+        [pool release];
+        
+    }];
+    
+    return maxIndex;
+    
+}
+
+
 #pragma mark  UserInfo  table
 /**********************用户信息表*********************************/
 - (void)createUserInfoTabel

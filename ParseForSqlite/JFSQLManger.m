@@ -28,7 +28,10 @@ static JFSQLManger  *shareManger = nil;
     [[SQLOperation sharedSQLOperation] createTable];
 }
 
-
++(void)closeDB
+{
+    [SQLOperation closeOperation];
+}
 +(void)insertToSql:(NSString*)strQuestion answer:(NSString*)strAnswer maintype:(int)mainType subType:(int)subType levelType:(int)leveltype  index:(int)index  typeString:(NSString*)typeString isAnswer:(int)isAnswer
 {
     
@@ -49,6 +52,15 @@ static JFSQLManger  *shareManger = nil;
 -(int)getMaxIndexFromTablePuzzleTable
 {
     return [[SQLOperation sharedSQLOperation] getMaxIndexINTablePUZZLEINFO];
+}
+
++(BOOL)isHasSameQuestion:(NSString*)strQuestion
+{
+    return [[JFSQLManger shareInstance] isHasSameQuestion:strQuestion];
+}
+-(BOOL)isHasSameQuestion:(NSString*)strQuestion
+{
+    return [[SQLOperation sharedSQLOperation] getIsHasSameQuestion:strQuestion];
 }
 
 @end
