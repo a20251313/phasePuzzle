@@ -46,12 +46,79 @@
 -(IBAction)clickStart:(id)sender
 {
    
-    [NSThread detachNewThreadSelector:@selector(wholeMiYuFromTxt) toTarget:self withObject:nil];
+    [NSThread detachNewThreadSelector:@selector(checkHasAnsewrInOption) toTarget:self withObject:nil];
     [JFSQLManger closeDB];
 }
 
 
 
+
+-(void)checkHasAnsewrInOption
+{
+    
+    NSMutableArray  *array = [JFPhaseData GetDataFromMiyudaquanTxt:@"/Users/popo/Desktop/Documents/idiom.txt"];
+    
+    if ([array count] < 5)
+    {
+        DLOG(@"array is not enouch");
+        return;
+    }
+    
+    int levelIndex = 0;//[JFSQLManger getMaxIndexFromTablePuzzleTable];
+    levelIndex++;
+    
+    int count = 0;
+    for (NSString  *strInfo in array)
+    {
+        strInfo = [strInfo stringByReplacingOccurrencesOfString:@"||" withString:@"|没有类型|"];
+        NSArray  *arrayObjects = [strInfo componentsSeparatedByString:@"|"];
+        
+        if ([arrayObjects count] < 2)
+        {
+            DLOG(@"arrayObjects:%@",arrayObjects);
+            continue;
+        }
+        NSString  *strAnswer = [arrayObjects objectAtIndex:0];
+        NSString  *strOptionStr = [arrayObjects objectAtIndex:1];
+
+        
+        if ([strOptionStr length] != 24)
+        {
+            count++;
+            DLOG(@"strOptionStr:%@ strAnswer:%@  length:%ld",strOptionStr,strAnswer,[strOptionStr length]);
+        }
+       
+        for (int i = 0;i < [strAnswer length];i++)
+        {
+            
+            BOOL  bhasAnswer = NO;
+            NSString  *strA = [strAnswer substringWithRange:NSMakeRange(i, 1)];
+            
+           
+            for (int j = 0; j < [strOptionStr length]; j++)
+            {
+                NSString  *strQ = [strOptionStr substringWithRange:NSMakeRange(j, 1)];
+                if ([strQ isEqualToString:strA])
+                {
+                    bhasAnswer = YES;
+                    continue;
+                }
+                
+            }
+            
+            if (!bhasAnswer)
+            {
+                count++;
+                DLOG(@"count:%d strOptionStr:%@ \nstrAnswer:%@",count,strOptionStr,strAnswer);
+                break;
+            }
+        }
+    }
+    
+    
+    
+    DLOG(@"wholeMiYuFromTxt finish");
+}
 
 -(void)wholeMiYuFromTxt
 {
@@ -73,7 +140,6 @@
     
         if ([arrayObjects count] >= 6)
         {
-       
             NSString  *strQ = [arrayObjects objectAtIndex:1];
             BOOL  bhasQ = [JFSQLManger isHasSameQuestion:strQ];
             if (bhasQ)
